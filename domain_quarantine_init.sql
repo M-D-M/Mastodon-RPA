@@ -13,18 +13,17 @@ BEGIN
     IF NEW.domain NOT IN (
         SELECT DISTINCT domain
             FROM accounts 
-            WHERE (created_at > SEARCH_INTERVAL)
-                AND (domain NOT IN (
-                    SELECT domain from domain_quarantine
-                ))
-                AND (domain NOT IN (
-                    SELECT DISTINCT domain
-                    FROM accounts
-                    WHERE created_at < SAFE_INTERVAL
-                ))
-                AND (domain NOT IN (
-                    SELECT domain FROM domain_blocks
-                ))
+            WHERE (domain NOT IN (
+                SELECT domain from domain_quarantine
+            ))
+            AND (domain NOT IN (
+                SELECT DISTINCT domain
+                FROM accounts
+                WHERE created_at < SAFE_INTERVAL
+            ))
+            AND (domain NOT IN (
+                SELECT domain FROM domain_blocks
+            ))
     ) THEN
         INSERT INTO domain_quarantine (domain, created_at)
             VALUES (NEW.domain, now());
